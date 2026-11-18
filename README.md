@@ -64,7 +64,7 @@ flowchart LR
 
 ## Status
 
-In development. The data pipeline is the first milestone.
+In development. The data pipeline is the first milestone. See [docs/design.md](docs/design.md) for the design and open questions.
 
 ## License
 
