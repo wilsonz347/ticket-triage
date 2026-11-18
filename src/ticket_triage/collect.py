@@ -30,7 +30,7 @@ START_DATE = "2022-01-01"
 # The database file. Raw pages are saved in a "raw" folder next to it.
 DB_PATH = Path("data") / "tickets.db"
 
-# Only ask for the fields we use. Otherwise JIRA sends about 120 fields per ticket.
+# Only the fields this project uses. Otherwise JIRA sends about 120 fields per ticket.
 FIELDS = [
     "project",
     "issuetype",
@@ -49,7 +49,7 @@ FIELDS = [
 # 100 tickets per page keeps each response under about 1 MB, edit history included.
 PAGE_SIZE = 100
 
-# JIRA reads the dates in our search in its own time zone, which we don't know.
+# JIRA reads dates in a search in its own time zone, which is unknown.
 # Going back one extra day covers any time zone difference. Tickets fetched
 # twice are simply replaced, so the overlap costs a little time and nothing else.
 OVERLAP = timedelta(days=1)
@@ -140,11 +140,11 @@ def build_query(project, since):
         since_text = since.strftime("%Y-%m-%d %H:%M")
         query = query + f' AND updated >= "{since_text}"'
 
-    # Sort by creation time, because it never changes. If we sorted by "updated",
-    # a ticket edited while we are paging would move to the end, every ticket
-    # after it would shift back one place, and we could skip one.
+    # Sort by creation time, because it never changes. Sorting by "updated" would
+    # move a ticket edited during paging to the end, shift every ticket after it
+    # back one place, and skip one.
     # The key breaks ties between tickets created at the same moment.
-    # shortcut: a ticket deleted or moved to another project while we page can
+    # shortcut: a ticket deleted or moved to another project during paging can
     # still shift results and skip one. It's rare; revisit if counts look off.
     query = query + " ORDER BY created ASC, key ASC"
     return query
@@ -153,7 +153,7 @@ def build_query(project, since):
 def fetch_page(query, start_at):
     """Ask JIRA for one page of tickets, starting at position `start_at` in the results.
 
-    Returns JIRA's answer as a dictionary. The parts we use:
+    Returns JIRA's answer as a dictionary. The parts used here:
     - "issues": the tickets on this page, each with its edit history ("changelog")
     - "total": how many tickets match the search in all
 
@@ -175,7 +175,7 @@ def fetch_page(query, start_at):
             with urllib.request.urlopen(request, timeout=60) as response:
                 return json.load(response)
         except urllib.error.HTTPError as error:
-            # A 4xx error means our request is wrong (for example a bad search),
+            # A 4xx error means the request is wrong (for example a bad search),
             # so trying again won't help. The exception is 429, "too many requests".
             if error.code < 500 and error.code != 429:
                 raise
@@ -232,13 +232,13 @@ def parse_changes(raw):
     """List every field edit in a ticket's history, one dictionary per edited field.
 
     JIRA groups edits made at the same moment into one history entry, so one
-    entry can hold several edited fields. We split them into one row each.
+    entry can hold several edited fields. Each edited field becomes its own row.
     """
     key = raw["key"]
     changelog = raw["changelog"]
     histories = changelog["histories"]
 
-    # shortcut: we only warn when JIRA leaves out part of a long history.
+    # shortcut: this only warns when JIRA leaves out part of a long history.
     # If this warning shows up, fetch those tickets' full history separately.
     if changelog["total"] > len(histories):
         print(
@@ -355,7 +355,7 @@ def run(projects=PROJECTS, db_path=DB_PATH):
             print(f"{project}:")
             total = total + collect_project(connection, project, since, raw_folder)
 
-        # We only get here if every project above was saved without an error.
+        # Reached only if every project above was saved without an error.
         write_last_run(connection, run_started_at)
     finally:
         connection.close()
