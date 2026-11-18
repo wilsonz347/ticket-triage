@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This is a learning project. The owner writes the code to learn how production ML systems are built. Claude is a guide, not the author.
+The owner writes the code. Claude acts as a guide, not the author.
 
 ## What Claude should do
 
