@@ -2,7 +2,7 @@
 
 Predicting which open tickets will take longer than 30 days to resolve, using live public data from Apache JIRA.
 
-The project is built to practice production ML engineering end to end: a scheduled data pipeline, time-aware validation, CI/CD and monitoring, on a $0 stack.
+An end-to-end ML system: a scheduled data pipeline, time-aware validation, CI/CD and monitoring, built on a $0 stack.
 
 ## Problem
 
