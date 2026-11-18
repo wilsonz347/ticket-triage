@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+
+# Local data
+data/
+
+# Secrets
+.env
+.env.*
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
