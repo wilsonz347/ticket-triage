@@ -1,24 +1,15 @@
-"""Collect: keep an up-to-date local copy of Apache JIRA tickets.
+"""Fetch Apache JIRA tickets and store them in a local SQLite database.
 
-How it works:
+The first run fetches every ticket created since START_DATE. Later runs fetch
+only tickets updated since the last successful run, minus OVERLAP.
 
-1. Look up when the last successful run started. On the very first run there
-   is none, so we fetch every ticket created since START_DATE (the backfill).
-2. For each project, ask JIRA for the tickets updated since then, one page
-   at a time.
-3. Save each page in two ways:
-   - the raw JSON, compressed, as a backup we can reprocess later
-   - the tickets and their edit history, in a SQLite database
-4. Only after every project is saved, record the time this run started.
+Each page is saved twice: as compressed raw JSON (a backup for reprocessing)
+and as rows in the tickets and changes tables. Tickets are replaced by key
+(like KAFKA-13575) and their history is rewritten, so re-running is safe.
+The last-run time is stored only after every project succeeds, so a failed
+run is redone in full next time.
 
-Running it twice is safe. Tickets are stored by their key (like KAFKA-13575),
-so a ticket fetched again replaces its old copy instead of being added twice.
-If a run crashes, the start time is not recorded, so the next run simply
-fetches the same tickets again.
-
-Run it from the project folder with:
-
-    python -m ticket_triage.collect
+Usage: python -m ticket_triage.collect
 """
 
 import gzip
