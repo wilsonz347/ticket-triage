@@ -62,6 +62,15 @@ flowchart LR
 - Features use only information available when the ticket was created.
 - Every model is compared against simple baselines, such as the historical resolution rate per project.
 
+## Setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+pytest
+```
+
 ## Status
 
 In development. The data pipeline is the first milestone. See [docs/design.md](docs/design.md) for the design and open questions.
